@@ -67,18 +67,6 @@ body.is-loading { overflow: hidden; }
 }
 .ulink:hover::after { transform: scaleX(1); transform-origin: left; }
 
-/* ---------- Cursor ---------- */
-.cursor {
-  position: fixed; left: 0; top: 0; z-index: 150; pointer-events: none;
-  width: 12px; height: 12px; margin: -6px 0 0 -6px; border-radius: 50%;
-  background: #fff; mix-blend-mode: difference; display: grid; place-items: center;
-  transition: width .35s var(--ease), height .35s var(--ease), margin .35s var(--ease), background .3s;
-}
-.cursor.is-label { width: 78px; height: 78px; margin: -39px 0 0 -39px; background: var(--lime); mix-blend-mode: normal; }
-.cursor__label { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--ink); opacity: 0; transition: opacity .2s; }
-.cursor.is-label .cursor__label { opacity: 1; }
-@media (hover: none) { .cursor { display: none; } }
-
 /* ---------- Floating nav / menu ---------- */
 .floatnav { transform: translate(-50%, -140%); transition: transform .6s var(--ease); }
 .floatnav.is-visible { transform: translate(-50%, 0); }
@@ -177,10 +165,10 @@ body.is-loading { overflow: hidden; }
 
 /* ---------- Alley ---------- */
 .look { margin: 0; }
-.look__img { border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 4.6; background: #1f1f22; clip-path: inset(100% 0 0 0 round 14px); }
-/* Hover uses the standalone `scale` property; GSAP owns `transform` for parallax */
-.look__img img { width: 100%; height: 120%; object-fit: cover; filter: grayscale(.25); transition: scale 1s var(--ease), filter .6s; }
-.look:hover .look__img img { scale: 1.06; filter: grayscale(0); }
+.look__img { border-radius: 14px; overflow: hidden; aspect-ratio: 4 / 4.6; background: #1f1f22; }
+/* GSAP owns image transform for scroll parallax; pointer movement does not affect it. */
+.look__img img { width: 100%; height: 120%; object-fit: cover; filter: grayscale(.25); transition: filter .6s; }
+.look:hover .look__img img { filter: grayscale(0); }
 .alley__big {
   font-family: "Anton", Impact, sans-serif; font-size: 22vw; line-height: .8; white-space: nowrap; color: transparent;
   -webkit-text-stroke: 1px rgba(233, 238, 119, .25); margin: 40px 0 -4vw; user-select: none;

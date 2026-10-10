@@ -4,7 +4,6 @@
   const $$ = (s, root = document) => [...root.querySelectorAll(s)];
   const src = (file) => encodeURI(file);
   const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const finePointer = matchMedia("(hover: hover) and (pointer: fine)").matches;
 
   /* ---------------------------------------------------------------
      Data
@@ -77,7 +76,7 @@
     card.dataset.tags = p.tags.join(" ");
     card.dataset.index = i;
     card.innerHTML = `
-      <div class="card__img relative aspect-square cursor-pointer overflow-hidden rounded-[10px] bg-white" data-cursor="View">
+      <div class="card__img relative aspect-square cursor-pointer overflow-hidden rounded-[10px] bg-white">
         <span class="absolute left-2.5 top-2.5 z-[2] rounded-full bg-lime px-2 py-1 text-[10px] font-semibold uppercase tracking-[.06em]">${p.label}</span>
         <img src="${src(p.img)}" alt="${p.name}" loading="lazy" class="h-full w-full object-cover transition-transform duration-[900ms] ease-out group-hover:scale-[1.08]">
         <button class="absolute bottom-2.5 right-2.5 z-[2] h-[34px] translate-y-3.5 rounded-full bg-ink px-3.5 text-xs text-white opacity-0 transition duration-500 ease-out group-hover:translate-y-0 group-hover:opacity-100 focus:translate-y-0 focus:opacity-100" data-qv="${i}">Quick view</button>
@@ -153,14 +152,13 @@
   const heroFiles = VARIANTS.flatMap((v) => [cutout(v, "front"), cutout(v, "back")]);
   const total = imgs.length + heroFiles.length;
   let loaded = 0;
-  const counter = { v: 0 };
+  const progress = { v: 0 };
   const bump = () => {
     loaded++;
-    gsap.to(counter, { v: (loaded / total) * 100, duration: 0.4, overwrite: true, onUpdate: renderCount });
+    gsap.to(progress, { v: (loaded / total) * 100, duration: 0.4, overwrite: true, onUpdate: renderProgress });
   };
-  const renderCount = () => {
-    $("#loaderCount").textContent = Math.round(counter.v);
-    $("#loaderBar").style.width = counter.v + "%";
+  const renderProgress = () => {
+    $("#loaderBar").style.width = progress.v + "%";
   };
   imgs.forEach((im) => (im.complete ? bump() : (im.addEventListener("load", bump, { once: true }), im.addEventListener("error", bump, { once: true }))));
   heroFiles.forEach((f) => { const im = new Image(); im.onload = im.onerror = bump; im.src = src(f); });
@@ -174,7 +172,7 @@
   gsap.from(".loader__brand span", { yPercent: 110, duration: 1, ease: "expo.out" });
 
   Promise.all([minTime, Promise.race([allLoaded, maxTime])]).then(() => {
-    gsap.to(counter, { v: 100, duration: 0.3, onUpdate: renderCount });
+    gsap.to(progress, { v: 100, duration: 0.3, onUpdate: renderProgress });
     const tl = gsap.timeline({ delay: 0.35, onComplete: () => {
       $("#loader").remove();
       document.body.classList.remove("is-loading");
@@ -196,7 +194,7 @@
   function heroIntro() {
     const tl = gsap.timeline();
     tl.from(".hero__title .char", { yPercent: 115, duration: 1.1, ease: "expo.out", stagger: 0.03 })
-      .from(hero.fx, { spin: -540, scale: 0.4, duration: 1.8, ease: "expo.out" }, 0)
+      .from(hero.fx, { scale: 0.4, duration: 1.8, ease: "expo.out" }, 0)
       .from("#garment", { opacity: 0, duration: 0.6 }, 0)
       .from(".floor", { scaleX: 0, opacity: 0, duration: 1.4, ease: "expo.out" }, 0.3)
       .from(".hero__ghost", { opacity: 0, scale: 1.15, duration: 1.6, ease: "expo.out" }, 0)
@@ -241,11 +239,10 @@
     apply(VARIANTS[0]);
 
     // Rotation state
-    let rotY = 0, target = 0, tiltX = 0, tiltTarget = 0, scrollSpin = 0;
-    let dragging = false, lastX = 0, vel = 0, spin = !reduceMotion;
-    let idleTimer;
+    let rotY = 0, target = 0;
+    let dragging = false, lastX = 0, vel = 0;
     // Tweenable extras layered on top of the drag rotation
-    const fx = { spin: 0, scale: 1 };
+    const fx = { scale: 1 };
 
     function select(i) {
       if (i === current) return;
@@ -255,7 +252,7 @@
       g.timeline()
         .to(fx, { scale: 0.82, duration: 0.3, ease: "power2.in" })
         .to(garment, { opacity: 0, duration: 0.3, ease: "power2.in" }, 0)
-        .add(() => { apply(VARIANTS[i]); target += 360; })
+        .add(() => { apply(VARIANTS[i]); })
         .to(fx, { scale: 1, duration: 0.7, ease: "expo.out" })
         .to(garment, { opacity: 1, duration: 0.4 }, "<");
       g.fromTo("#readout .readout__name, #readout .readout__color", { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: "expo.out" });
@@ -263,8 +260,6 @@
 
     function setView(view) {
       $$(".viewbtn").forEach((b) => b.classList.toggle("is-active", b.dataset.view === view));
-      if (view === "spin") { spin = true; return; }
-      spin = false;
       // Nearest angle that shows the requested side
       const base = view === "front" ? 0 : 180;
       target = Math.round((target - base) / 360) * 360 + base;
@@ -273,7 +268,7 @@
 
     // Drag to rotate (with inertia)
     stage.addEventListener("pointerdown", (e) => {
-      dragging = true; lastX = e.clientX; vel = 0; spin = false;
+      dragging = true; lastX = e.clientX; vel = 0;
       $$(".viewbtn").forEach((b) => b.classList.remove("is-active"));
       stage.setPointerCapture(e.pointerId);
     });
@@ -281,14 +276,12 @@
       if (!dragging) return;
       const dx = e.clientX - lastX;
       lastX = e.clientX;
-      target += dx * 0.5;
-      vel = dx * 0.5;
+      target += dx * 0.75;
+      vel = dx * 0.75;
     });
     const end = () => {
       if (!dragging) return;
       dragging = false;
-      clearTimeout(idleTimer);
-      idleTimer = setTimeout(() => { if (!dragging) setView("spin"); }, 4000);
     };
     stage.addEventListener("pointerup", end);
     stage.addEventListener("pointercancel", end);
@@ -297,30 +290,15 @@
     stage.tabIndex = 0;
     stage.setAttribute("aria-label", "3D garment viewer. Use left and right arrow keys to rotate.");
     stage.addEventListener("keydown", (e) => {
-      if (e.key === "ArrowLeft") { spin = false; target -= 30; }
-      if (e.key === "ArrowRight") { spin = false; target += 30; }
+      if (e.key === "ArrowLeft") target -= 30;
+      if (e.key === "ArrowRight") target += 30;
     });
-
-    // Pointer tilt + spotlight
-    const card = $("#heroCard");
-    const spot = $("#heroSpot");
-    card.addEventListener("pointermove", (e) => {
-      const r = card.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5;
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      tiltTarget = -py * 14;
-      spot.style.transform = `translate(${e.clientX - r.left}px, ${e.clientY - r.top}px)`;
-      if (g) g.to(".hero__ghost", { x: -px * 60, duration: 1, overwrite: "auto" });
-    });
-    card.addEventListener("pointerleave", () => (tiltTarget = 0));
 
     const loop = () => {
-      if (spin && !dragging) target += 0.25;
       if (!dragging && Math.abs(vel) > 0.01) { target += vel; vel *= 0.92; }
-      rotY += (target - rotY) * 0.08;
-      tiltX += (tiltTarget - tiltX) * 0.08;
-      const ang = rotY + scrollSpin + fx.spin;
-      garment.style.transform = `rotateX(${tiltX.toFixed(2)}deg) rotateY(${ang.toFixed(2)}deg) scale(${fx.scale.toFixed(3)})`;
+      rotY += (target - rotY) * (dragging ? 0.18 : 0.08);
+      const ang = rotY;
+      garment.style.transform = `rotateY(${ang.toFixed(2)}deg) scale(${fx.scale.toFixed(3)})`;
       const n = ((ang % 360) + 360) % 360;
       const isBack = n > 90 && n < 270;
       if (sideLabel.dataset.side !== String(isBack)) {
@@ -336,12 +314,11 @@
 
     return {
       fx,
-      setScrollSpin(v) { scrollSpin = v; },
     };
   }
 
   /* ---------------------------------------------------------------
-     UI: menu, cursor, magnetic, chips, modal, form, flip image
+     UI: menu, chips, modal, form, flip image
   --------------------------------------------------------------- */
   function initUI() {
     const g = window.gsap;
@@ -379,44 +356,6 @@
     $$("[data-menu-open]").forEach((b) => b.addEventListener("click", openMenu));
     $$("[data-menu-close]").forEach((b) => b.addEventListener("click", closeMenu));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") { closeMenu(); closeQV(); } });
-
-    // Cursor
-    const cursor = $("#cursor");
-    const label = $("#cursorLabel");
-    if (finePointer && g) {
-      const xTo = g.quickTo(cursor, "x", { duration: 0.35, ease: "power3" });
-      const yTo = g.quickTo(cursor, "y", { duration: 0.35, ease: "power3" });
-      window.addEventListener("pointermove", (e) => { xTo(e.clientX); yTo(e.clientY); });
-      document.addEventListener("pointerover", (e) => {
-        const el = e.target.closest("[data-cursor]");
-        if (el) { label.textContent = el.dataset.cursor; cursor.classList.add("is-label"); }
-        else cursor.classList.remove("is-label");
-      });
-    } else cursor.remove();
-
-    // Magnetic buttons
-    if (finePointer && g) {
-      $$(".magnetic").forEach((el) => {
-        el.addEventListener("pointermove", (e) => {
-          const r = el.getBoundingClientRect();
-          g.to(el, { x: (e.clientX - r.left - r.width / 2) * 0.3, y: (e.clientY - r.top - r.height / 2) * 0.4, duration: 0.4, ease: "power3" });
-        });
-        el.addEventListener("pointerleave", () => g.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, .4)" }));
-      });
-    }
-
-    // 3D tilt on collection cards
-    if (finePointer && g) {
-      $$(".card").forEach((c) => {
-        c.addEventListener("pointermove", (e) => {
-          const r = c.getBoundingClientRect();
-          const px = (e.clientX - r.left) / r.width - 0.5;
-          const py = (e.clientY - r.top) / r.height - 0.5;
-          g.to(c, { rotateY: px * 10, rotateX: -py * 10, transformPerspective: 900, duration: 0.5, ease: "power3" });
-        });
-        c.addEventListener("pointerleave", () => g.to(c, { rotateX: 0, rotateY: 0, duration: 0.8, ease: "expo.out" }));
-      });
-    }
 
     // Flip the about photo front/back
     const flip = $("#flipimg");
@@ -485,9 +424,8 @@
       onLeaveBack: () => $("#floatnav").classList.remove("is-visible"),
     });
 
-    // Hero: garment keeps spinning as you scroll away, card eases back
-    gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true,
-      onUpdate: (st) => hero.setScrollSpin(st.progress * 300) } })
+    // Hero: card eases back as you scroll away
+    gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } })
       .to(".hero__card", { scale: 0.94, borderRadius: 40, ease: "none" }, 0)
       .to(".hero__title", { yPercent: -40, opacity: 0.2, ease: "none" }, 0)
       .to(".stage", { yPercent: -30, ease: "none" }, 0);
@@ -564,11 +502,31 @@
     gsap.from(".card", { y: 80, opacity: 0, rotate: 3, duration: 1, ease: "expo.out", stagger: 0.07,
       scrollTrigger: { trigger: ".collection", start: "top 70%" } });
 
-    // Alley: clip-path reveals + inner parallax
+    // Alley: soft upward reveals, captions that follow, and a restrained image drift.
     $$(".look").forEach((look, i) => {
-      gsap.to($(".look__img", look), { clipPath: "inset(0% 0 0 0 round 14px)", duration: 1.3, ease: "expo.inOut", delay: i * 0.12,
-        scrollTrigger: { trigger: ".alley__grid", start: "top 80%" } });
-      gsap.fromTo($("img", look), { yPercent: -12 }, { yPercent: 0, ease: "none",
+      const frame = $(".look__img", look);
+      const image = $("img", look);
+      const caption = $("figcaption", look);
+
+      if (reduceMotion) {
+        gsap.set(frame, { clipPath: "inset(0% 0 0 0 round 14px)", y: 0, autoAlpha: 1 });
+        return;
+      }
+
+      const reveal = gsap.timeline({
+        delay: i * 0.14,
+        scrollTrigger: { trigger: look, start: "top 84%", once: true },
+      });
+      reveal.fromTo(frame,
+        { clipPath: "inset(100% 0 0 0 round 14px)", y: 34, autoAlpha: 0 },
+        { clipPath: "inset(0% 0 0 0 round 14px)", y: 0, autoAlpha: 1, duration: 1.2, ease: "power4.out" }
+      ).fromTo(caption,
+        { y: 16, autoAlpha: 0 },
+        { y: 0, autoAlpha: 1, duration: 0.65, ease: "power3.out" },
+        "-=0.52"
+      );
+
+      gsap.fromTo(image, { yPercent: -9, scale: 1.06 }, { yPercent: 0, scale: 1, ease: "none",
         scrollTrigger: { trigger: look, start: "top bottom", end: "bottom top", scrub: true } });
     });
     gsap.fromTo("#bigword", { xPercent: 0 }, { xPercent: -35, ease: "none",
