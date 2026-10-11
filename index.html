@@ -43,7 +43,7 @@
   <div id="progress" class="fixed left-0 top-0 z-[120] h-[3px] w-full origin-left scale-x-0 bg-lime"></div>
 
   <!-- Floating nav (after hero) -->
-  <<header id="floatnav" class="floatnav fixed left-1/2 top-3.5 z-[90] flex w-[min(1100px,calc(100%-28px))] items-center justify-between rounded-full bg-white/80 py-2 pl-6 pr-2 shadow-[0_10px_40px_rgba(0,0,0,.08)] backdrop-blur-md">
+  <header id="floatnav" class="floatnav fixed left-1/2 top-3.5 z-[90] flex w-[min(1100px,calc(100%-28px))] items-center justify-between rounded-full bg-white/80 py-2 pl-6 pr-2 shadow-[0_10px_40px_rgba(0,0,0,.08)] backdrop-blur-md">
   <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
 
   <!-- Desktop links -->
@@ -82,9 +82,30 @@
 
   <main id="top">
 
-    <!-- ================= HERO ================= -->
+        <!-- ================= HERO ================= -->
     <section id="hero" class="hero px-3 pt-3 md:px-5 md:pt-5">
-      <div id="heroCard" class="hero__card relative isolate h-[calc(100svh-84px)] min-h-[560px] overflow-hidden rounded-t-card">
+
+      <!-- Top nav bar -->
+      <div class="bar flex h-16 items-center justify-between rounded-t-card bg-mist px-5 md:px-11">
+        <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
+
+        <!-- Desktop links -->
+        <nav class="hidden items-center gap-8 text-[13px] font-medium md:flex" aria-label="Primary">
+          <a href="#about" class="ulink">About</a>
+          <a href="#collection" class="ulink">Collection</a>
+          <a href="#alley" class="ulink">Lookbook</a>
+          <a href="#contact" class="ulink">Wholesale</a>
+        </nav>
+
+        <div class="flex items-center gap-5">
+          <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
+          <!-- Mobile only -->
+          <button class="menu-btn md:hidden" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
+        </div>
+      </div>
+
+      <!-- Hero card -->
+      <div id="heroCard" class="hero__card relative isolate h-[calc(100svh-84px)] min-h-[560px] overflow-hidden rounded-b-card">
         <div id="heroSpot" class="hero__spot"></div>
         <div class="hero__ghost" aria-hidden="true">UNBNDED</div>
 
@@ -131,23 +152,6 @@
         <div class="hero__hint absolute right-11 top-1/2 z-[3] hidden items-center gap-2.5 text-[11px] uppercase tracking-[.06em] text-[#3b3b3f] [writing-mode:vertical-rl] md:flex"><i></i>Drag to rotate</div>
       </div>
 
-      <div class="bar flex h-16 items-center justify-between rounded-b-card bg-mist px-5 md:px-11">
-  <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
-
-  <!-- Desktop links -->
-  <nav class="hidden items-center gap-8 text-[13px] font-medium md:flex" aria-label="Primary">
-    <a href="#about" class="ulink">About</a>
-    <a href="#collection" class="ulink">Collection</a>
-    <a href="#alley" class="ulink">Lookbook</a>
-    <a href="#contact" class="ulink">Wholesale</a>
-  </nav>
-
-  <div class="flex items-center gap-5">
-    <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
-    <!-- Mobile only -->
-    <button class="menu-btn md:hidden" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
-  </div>
-</div>
     </section>
 
     <!-- ================= MARQUEE ================= -->

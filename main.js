@@ -426,7 +426,7 @@
 
     // Hero: card eases back as you scroll away
     gsap.timeline({ scrollTrigger: { trigger: ".hero", start: "top top", end: "bottom top", scrub: true } })
-      .to(".hero__card", { scale: 0.94, borderRadius: 40, ease: "none" }, 0)
+.to(".hero__card", { scale: 0.94, borderBottomLeftRadius: 40, borderBottomRightRadius: 40, ease: "none" }, 0)
       .to(".hero__title", { yPercent: -40, opacity: 0.2, ease: "none" }, 0)
       .to(".stage", { yPercent: -30, ease: "none" }, 0);
 
