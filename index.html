@@ -43,13 +43,23 @@
   <div id="progress" class="fixed left-0 top-0 z-[120] h-[3px] w-full origin-left scale-x-0 bg-lime"></div>
 
   <!-- Floating nav (after hero) -->
-  <header id="floatnav" class="floatnav fixed left-1/2 top-3.5 z-[90] flex w-[min(1100px,calc(100%-28px))] items-center justify-between rounded-full bg-white/80 py-2 pl-6 pr-2 shadow-[0_10px_40px_rgba(0,0,0,.08)] backdrop-blur-md">
-    <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
-    <div class="flex items-center gap-5">
-      <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
-      <button class="menu-btn" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
-    </div>
-  </header>
+  <<header id="floatnav" class="floatnav fixed left-1/2 top-3.5 z-[90] flex w-[min(1100px,calc(100%-28px))] items-center justify-between rounded-full bg-white/80 py-2 pl-6 pr-2 shadow-[0_10px_40px_rgba(0,0,0,.08)] backdrop-blur-md">
+  <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
+
+  <!-- Desktop links -->
+  <nav class="hidden items-center gap-8 text-[13px] font-medium md:flex" aria-label="Primary">
+    <a href="#about" class="ulink">About</a>
+    <a href="#collection" class="ulink">Collection</a>
+    <a href="#alley" class="ulink">Lookbook</a>
+    <a href="#contact" class="ulink">Wholesale</a>
+  </nav>
+
+  <div class="flex items-center gap-5">
+    <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
+    <!-- Mobile only -->
+    <button class="menu-btn md:hidden" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
+  </div>
+</header>
 
   <!-- Menu overlay -->
   <nav id="menu" class="menu fixed inset-0 z-[160] flex flex-col justify-between bg-ink px-5 py-7 text-white md:px-14" aria-hidden="true">
@@ -122,12 +132,22 @@
       </div>
 
       <div class="bar flex h-16 items-center justify-between rounded-b-card bg-mist px-5 md:px-11">
-        <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
-        <div class="flex items-center gap-5">
-          <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
-          <button class="menu-btn" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
-        </div>
-      </div>
+  <a href="#top" class="font-display text-[22px] uppercase">UNBNDED.</a>
+
+  <!-- Desktop links -->
+  <nav class="hidden items-center gap-8 text-[13px] font-medium md:flex" aria-label="Primary">
+    <a href="#about" class="ulink">About</a>
+    <a href="#collection" class="ulink">Collection</a>
+    <a href="#alley" class="ulink">Lookbook</a>
+    <a href="#contact" class="ulink">Wholesale</a>
+  </nav>
+
+  <div class="flex items-center gap-5">
+    <a href="#contact" class="btn btn--lime hidden sm:inline-flex">Contact us</a>
+    <!-- Mobile only -->
+    <button class="menu-btn md:hidden" data-menu-open aria-label="Open menu"><span>Menu</span><i class="dots"></i></button>
+  </div>
+</div>
     </section>
 
     <!-- ================= MARQUEE ================= -->
